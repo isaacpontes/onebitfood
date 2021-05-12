@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
+use function PHPUnit\Framework\isNull;
 
 class CategoryController extends Controller
 {
@@ -15,7 +18,14 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            $categories = Category::all();
+            return response()->json($categories);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "message" => "Error getting categories."
+            ], 400);
+        }
     }
 
     /**
@@ -26,7 +36,23 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'title' => 'required',
+            'image' => 'required|mimes:png,jpg,jpeg|max:2048'
+        ]);
+
+        try {
+            $path = $request->file('image')->store('images/categories', 'public');
+            $category = new Category();
+            $category->title = $request->title;
+            $category->image_url = $path;
+            $category->save();
+            return response()->json($category, 201);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "message" => "Error saving category."
+            ], 400);
+        }
     }
 
     /**
@@ -37,7 +63,7 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        //
+        return response()->json($category);
     }
 
     /**
@@ -49,7 +75,13 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
-        //
+        $request->validate([
+            'title' => 'required'
+        ]);
+
+        $category->update(['title' => $request->title]);
+
+        return response()->json($category);
     }
 
     /**
@@ -60,6 +92,16 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        //
+        try {
+            Storage::disk('public')->delete($category->image_url);
+            $category->delete();
+            return response()->json([
+                'message' => 'Category deleted'
+            ], 204);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "message" => "Error deleting category."
+            ], 400);
+        }
     }
 }
