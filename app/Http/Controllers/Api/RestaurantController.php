@@ -17,7 +17,9 @@ class RestaurantController extends Controller
     public function index()
     {
         try {
-            $restaurants = Restaurant::all();
+            $restaurants = Restaurant::query()
+                ->with('product_categories')
+                ->get();
             return response()->json($restaurants);
         } catch (\Throwable $th) {
             return response()->json([
@@ -78,6 +80,7 @@ class RestaurantController extends Controller
      */
     public function show(Restaurant $restaurant)
     {
+        $restaurant->load('product_categories');
         return response()->json($restaurant);
     }
 

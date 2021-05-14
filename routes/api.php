@@ -26,7 +26,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::apiResource('/categories', CategoryController::class);
 Route::apiResource('/restaurants', RestaurantController::class)->except(['update']);
-Route::apiResource('/product-categories', ProductCategoryController::class)->only(['store']);
-Route::apiResource('/products', ProductController::class)->only(['store']);
-Route::apiResource('/orders', OrderController::class)->only(['store', 'show']);
+Route::apiResource('/product-categories', ProductCategoryController::class)->only(['store', 'show']);
+Route::apiResource('/products', ProductController::class)->only(['store', 'show']);
+Route::apiResource('/orders', OrderController::class)->only(['store', 'show', 'destroy']);
+Route::patch('/orders/{order}/update-status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
 Route::get('/available-cities', [AvailableCitiesController::class, 'index'])->name('available-cities');

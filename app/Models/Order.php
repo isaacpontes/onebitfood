@@ -27,8 +27,8 @@ class Order extends Model
         return $this->belongsTo(Restaurant::class);
     }
 
-    public function order_products()
+    public function products()
     {
-        return $this->hasMany(OrderProduct::class);
+        return $this->belongsToMany(Product::class, 'order_products')->withPivot(['quantity', 'comment']);
     }
 }
