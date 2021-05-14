@@ -38,7 +38,7 @@ class ProductCategoryController extends Controller
     {
         $request->validate([
             'title' => 'required|string',
-            'restaurant_id' => 'required|string'
+            'restaurant_id' => 'required|numeric'
         ]);
 
         try {
@@ -77,11 +77,11 @@ class ProductCategoryController extends Controller
     public function update(Request $request, ProductCategory $productCategory)
     {
         $request->validate([
-            'title' => 'required\string',
+            'title' => 'required|string',
         ]);
 
         try {
-            $productCategory->update(['name' => $request->name]);
+            $productCategory->update(['title' => $request->title]);
             return response()->json($productCategory, 200);
         } catch (\Throwable $th) {
             return response()->json([

@@ -7,8 +7,6 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-use function PHPUnit\Framework\isNull;
-
 class CategoryController extends Controller
 {
     /**
@@ -19,11 +17,18 @@ class CategoryController extends Controller
     public function index()
     {
         try {
-            $categories = Category::all();
+            $categories = Category::query()
+                ->get([
+                    'id',
+                    'title',
+                    'image_url'
+                ]);
+
             return response()->json($categories);
         } catch (\Throwable $th) {
             return response()->json([
-                "message" => "Error getting categories."
+                "message" => "Error getting categories.",
+                "error" => $th->getMessage()
             ], 400);
         }
     }
@@ -63,6 +68,7 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
+        $category->load('restaurants');
         return response()->json($category);
     }
 
